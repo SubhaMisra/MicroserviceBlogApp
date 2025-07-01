@@ -22,7 +22,7 @@ public class CommentServiceImpl implements CommentService {
 
     public Comment saveComment(Comment comment)
     {
-        Post post = restTemplateConfig.getRestTemplate().getForObject("http://POST-SERVICE:8081/api/posts/" + comment.getPostId(), Post.class);
+        Post post = restTemplateConfig.getRestTemplate().getForObject("http://POST-SERVICE/api/posts/" + comment.getPostId(), Post.class);
 
         if(post!=null)
         {
