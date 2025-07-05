@@ -12,11 +12,11 @@ spring:
           enabled: true
           lowerCaseServiceId: true
       routes:
-        - id: COMMENT-SERVICE
+        - id: comment-service
           uri: lb://COMMENT-SERVICE
           predicates:
             - Path=/api/comments/**
-        - id: POST-SERVICE
+        - id: post-service
           uri: lb://POST-SERVICE
           predicates:
             - Path=/api/posts/**

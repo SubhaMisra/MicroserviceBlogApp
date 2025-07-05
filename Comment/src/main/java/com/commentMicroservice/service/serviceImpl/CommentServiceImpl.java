@@ -5,7 +5,9 @@ import com.commentMicroservice.entity.Comment;
 import com.commentMicroservice.payload.Post;
 import com.commentMicroservice.repository.CommentRepository;
 import com.commentMicroservice.service.CommentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +19,17 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
+    private static final String SERVICE_NAME = "COMMENT-SERVICE";
+
+    private static final String POST_SERVICE_URL = "http://POST-SERVICE/api/posts/";
+
     @Autowired
     private RestTemplateConfig restTemplateConfig;
 
+    @CircuitBreaker(name = SERVICE_NAME,fallbackMethod = "getDefault")
     public Comment saveComment(Comment comment)
     {
-        Post post = restTemplateConfig.getRestTemplate().getForObject("http://POST-SERVICE/api/posts/" + comment.getPostId(), Post.class);
+        Post post = restTemplateConfig.getRestTemplate().getForObject( POST_SERVICE_URL+ comment.getPostId(), Post.class);
 
         if(post!=null)
         {
@@ -39,5 +46,10 @@ public class CommentServiceImpl implements CommentService {
 
         List<Comment> comments = commentRepository.findByPostId(postId);
         return comments;
+    }
+
+    public Comment getDefault(Comment comment, Exception e) {
+        System.out.println("***** fallback method called... *******");
+        return new Comment();
     }
 }
